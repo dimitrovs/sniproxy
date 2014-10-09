@@ -76,7 +76,7 @@ static struct ev_timer resolv_timeout_watcher;
 
 static void resolv_sock_cb(struct ev_loop *, struct ev_io *, int);
 static void resolv_timeout_cb(struct ev_loop *, struct ev_timer *, int);
-static void dns_query_cb(struct dns_ctx *, struct dns_rr_a4 *, void *);
+static void dns_query_cb(struct dns_ctx *, struct dns_rr_a6 *, void *);
 static void dns_timer_setup_cb(struct dns_ctx *, int, void *);
 
 
@@ -136,7 +136,7 @@ resolv_query(const char *hostname, void (*client_cb)(struct Address *, void *), 
     cb_data->client_cb_data = client_cb_data;
 
     /* Just resolving A records for now */
-    cb_data->query = dns_submit_a4(ctx,
+    cb_data->query = dns_submit_a6(ctx,
             hostname, 0,
             dns_query_cb, cb_data);
     if (cb_data->query == NULL) {
@@ -178,17 +178,17 @@ resolv_sock_cb(struct ev_loop *loop, struct ev_io *w, int revents) {
  * Wrapper for client callback we provide to udns
  */
 static void
-dns_query_cb(struct dns_ctx *ctx, struct dns_rr_a4 *result, void *data) {
+dns_query_cb(struct dns_ctx *ctx, struct dns_rr_a6 *result, void *data) {
     struct ResolvQuery *cb_data = (struct ResolvQuery *)data;
     struct Address *address = NULL;
 
     if (result == NULL) {
         info("resolv: %s\n", dns_strerror(dns_status(ctx)));
-    } else if (result->dnsa4_nrr > 0) {
-        struct sockaddr_in sa = {
-            .sin_family = AF_INET,
-            .sin_port = 0,
-            .sin_addr = result->dnsa4_addr[0],
+    } else if (result->dnsa6_nrr > 0) {
+        struct sockaddr_in6 sa = {
+            .sin6_family = AF_INET,
+            .sin6_port = 0,
+            .sin6_addr = result->dnsa6_addr[0],
         };
 
         address = new_address_sa((struct sockaddr *)&sa, sizeof(sa));
