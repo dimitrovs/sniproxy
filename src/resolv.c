@@ -186,7 +186,7 @@ dns_query_cb(struct dns_ctx *ctx, struct dns_rr_a6 *result, void *data) {
         info("resolv: %s\n", dns_strerror(dns_status(ctx)));
     } else if (result->dnsa6_nrr > 0) {
         struct sockaddr_in6 sa = {
-            .sin6_family = AF_INET,
+            .sin6_family = AF_INET6,
             .sin6_port = 0,
             .sin6_addr = result->dnsa6_addr[0],
         };
